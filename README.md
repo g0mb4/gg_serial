@@ -1,13 +1,13 @@
 # gmbs go serial
 
 # example
-```
+```go
 package main
 
 import (
 	"log"
 
-	serial "./gg_serial"
+	serial "github.com/g0mb4/gmbs-go-serial"
 )
 
 func main() {
