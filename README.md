@@ -7,7 +7,7 @@ package main
 import (
 	"log"
 
-	serial "github.com/g0mb4/gmbs-go-serial"
+	serial "github.com/g0mb4/gg_serial"
 )
 
 func main() {
