@@ -6,12 +6,14 @@
 
 #elif defined __linux__
 	#define SHANDLE 	int
-	
+
 #endif
 
 typedef struct S_SERIAL {
 	SHANDLE port_handle;
 	int baud_rate;
+	char blocking;
+	int read_timeout;
 	int error;
 } serial_t;
 

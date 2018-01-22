@@ -44,17 +44,6 @@ char ggs_read_byte(serial_t *serial){
 	#endif
 }
 
-char ggs_read_byte_non_blocking(serial_t *serial){
-	#if defined _WIN32 || defined __CYGWIN__
-		return win_read_byte_non_blocking(serial);
-	#elif defined __linux__
-		return linux_read_byte_non_blocking(serial);
-
-	#elif defined __APPLE__
-
-	#endif
-}
-
 void ggs_write_string(serial_t *serial, const char* msg){
 	#if defined _WIN32 || defined __CYGWIN__
 		win_write_string(serial, msg);

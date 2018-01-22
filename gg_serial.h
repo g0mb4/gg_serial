@@ -19,7 +19,7 @@ void ggs_close(serial_t *serial);
 
 void ggs_write_byte(serial_t *serial, char byte);
 char ggs_read_byte(serial_t *serial);
-char ggs_read_byte_non_blocking(serial_t *serial);
+
 void ggs_write_string(serial_t *serial, const char* msg);
 
 #endif

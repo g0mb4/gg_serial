@@ -12,20 +12,27 @@ import (
 
 func main() {
 	var err error
-	
-	s := serial.NewSerial("COM2", 9600)
+	var b byte
+
+	s := serial.NewSerial("COM1", 9600, true, 100)
 	defer s.Close()
 
 	err = s.Open()
 	if err != nil {
-		log.Printf("%v", err)
+		log.Panicf("%v", err)
 	}
 
-	err = s.WriteByte('a')
-
+	err = s.WriteText("Send me a char!")
 	if err != nil {
 		log.Printf("%v", err)
 	}
+
+	b, err = s.ReadByte()
+	if err != nil {
+		log.Printf("%v", err)
+	} else {
+		log.Printf("Read: %c (%d)\n", b, b)
+	} 
 
 }
 ```

@@ -69,7 +69,7 @@ void win_open(serial_t *serial, const char* port){
 	 * src: https://msdn.microsoft.com/en-us/library/windows/desktop/aa363190(v=vs.85).aspx
 	 */
 	COMMTIMEOUTS timeouts = { 0 };
-	timeouts.ReadIntervalTimeout = 50;			// ms
+	timeouts.ReadIntervalTimeout = (DWORD)serial->read_timeout;	 // ms
 	timeouts.ReadTotalTimeoutConstant = 50;
 	timeouts.ReadTotalTimeoutMultiplier = 10;
 	timeouts.WriteTotalTimeoutConstant = 50;	// ms
@@ -125,8 +125,21 @@ char win_read_byte(serial_t *serial){
 	char byte_read = 0;
 	DWORD dwBytesRead = 0;
 
-	/* read from port continously */
-	for(;;) {
+	if(serial->blocking){
+		for(;;) {
+			if (!ReadFile(serial->port_handle, &byte_read, 1, &dwBytesRead, NULL)) {
+				serial->error = 9;
+				return 0;
+			}
+			/* no bytes were read so wait longer */
+			if ((int)dwBytesRead != 1) {
+				continue;
+			/* ok, we can proceed */
+			} else {
+				break;
+			}
+		}
+	} else {
 		if (!ReadFile(serial->port_handle, &byte_read, 1, &dwBytesRead, NULL)) {
 			serial->error = 9;
 			return 0;
@@ -134,37 +147,9 @@ char win_read_byte(serial_t *serial){
 
 		/* no bytes were read so wait longer */
 		if ((int)dwBytesRead != 1) {
-			continue;
-		/* ok, we can proceed */
-		} else {
-			break;
+			serial->error = 10;
+			return 0;
 		}
-	}
-
-	return byte_read;
-}
-
-char win_read_byte_non_blocking(serial_t *serial){
-	serial->error = 0;
-
-	if (serial->port_handle == UNOPENED) {
-		serial->error = 6;
-		return 0;
-	}
-
-	char byte_read = 0;
-	DWORD dwBytesRead = 0;
-
-	/* read from port */
-	if (!ReadFile(serial->port_handle, &byte_read, 1, &dwBytesRead, NULL)) {
-		serial->error = 9;
-		return 0;
-	}
-
-	/* no bytes were read */
-	if ((int)dwBytesRead != 1) {
-		serial->error = 10;
-		return 0;
 	}
 
 	return byte_read;
@@ -183,12 +168,12 @@ void win_write_string(serial_t *serial, const char* msg){
 
 	/* same as win_write_byte() expect from the size */
 	if (!WriteFile(serial->port_handle, msg, n, &dwBytesWritten, NULL)) {
-		serial->error = 11;
+		serial->error = 7;
 		return;
 	}
 
-	if ((int)dwBytesWritten == n) {
-		serial->error = 12;
+	if ((int)dwBytesWritten != (int)n) {
+		serial->error = 8;
 		return;
 	}
 }
