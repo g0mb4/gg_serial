@@ -1,5 +1,5 @@
 # gmbs go serial
-
+Only for Windows. Linux version is coming (soon?)
 # example
 ```go
 package main
